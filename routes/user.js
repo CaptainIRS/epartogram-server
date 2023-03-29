@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { auth } = require('../firebase');
+const { auth } = require('../utils/firebase');
 
 // Useless route, just to test if auth is working
 router.get('/', async (req, res) => {
