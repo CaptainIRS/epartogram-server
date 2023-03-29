@@ -6,16 +6,14 @@ const { auth } = require("../utils/firebase");
 const Hospital = require("../models/Hospital");
 
 router.use((req, res, next)  => {
-    const token = req.header("X-Token-Firebase");
-    if(!token) return res.status(400).json({message: "invalid token"})
-    // else if(req.user.role === "Admin") {
-    //     return res.status(401).json({message: "unauthorized"})
-    // }
-    req.token = token;
+    if(req.user.role !== "Admin") {
+        return res.status(401).json({message: "unauthorized"})
+    }
+    req.token = req.user.id;
     next()
 })
 
-router.post("/addHospital", async (req, res) => {
+router.post("/hospital", async (req, res) => {
     const admin = req.token;
     const {
 		name,
@@ -44,7 +42,7 @@ router.post("/addHospital", async (req, res) => {
 	}
 });
 
-router.post("/addStaff", async (req, res) => {
+router.post("/staff", async (req, res) => {
     const {
 		staffId,
         isActive,
@@ -63,7 +61,7 @@ router.post("/addStaff", async (req, res) => {
 	}
 });
 
-router.put("/updateStaffStatus", async (req, res) => {
+router.put("/staff", async (req, res) => {
     const {
 		staffId,
         isActive,
@@ -82,7 +80,7 @@ router.put("/updateStaffStatus", async (req, res) => {
 	}
 });
 
-router.put("/updateCapacity", async (req, res) => {
+router.put("/capacity", async (req, res) => {
     const {
 		capacity
 	} = req.body;
@@ -104,7 +102,7 @@ router.put("/updateCapacity", async (req, res) => {
 	}
 });
 
-router.get("/getAll", async (req, res) => {
+router.get("/", async (req, res) => {
 	try {
         const admin = req.token;
 		const body = await Hospital.getAll(admin);
