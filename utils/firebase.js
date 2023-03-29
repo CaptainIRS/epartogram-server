@@ -10,10 +10,12 @@ const db = admin.firestore();
 const auth = admin.auth();
 const firestore = admin.firestore();
 const fcm = admin.messaging();
+const appCheck = admin.appCheck();
 
 module.exports = {
     db,
     auth,
     firestore,
-    fcm
+    fcm,
+    appCheck
 }
