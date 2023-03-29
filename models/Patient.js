@@ -1,4 +1,4 @@
-const { auth, firestore } = require("../firebase");
+const { auth, firestore } = require("../utils/firebase");
 
 const PATIENT_MODEL = "patients";
 
@@ -32,6 +32,7 @@ class Patient {
 		this.height = height;
 		this.doctor = doctor;
 		this.nurse = nurse;
+		this.hospital = hospital;
 	}
 
 	static getRiskFactors() {
@@ -58,6 +59,23 @@ class Patient {
 					reject("Patient not found");
 				}
 				resolve({ id: snapshot.id, ...snapshot.data() });
+			} catch (error) {
+				reject(error);
+			}
+		});
+	}
+
+	static findAll() {
+		return new Promise(async (resolve, reject) => {
+			try {
+				const snapshot = await firestore
+					.collection(PATIENT_MODEL)
+					.get();
+				const patients = [];
+				snapshot.forEach((doc) => {
+					patients.push({ id: doc.id, ...doc.data() });
+				});
+				resolve(patients);
 			} catch (error) {
 				reject(error);
 			}
@@ -101,6 +119,20 @@ class Patient {
 					patients.push({ id: doc.id, ...doc.data() });
 				});
 				resolve(patients);
+			} catch (error) {
+				reject(error);
+			}
+		});
+	}
+
+	static addMeasurement(patientId, patientData) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				await firestore
+					.collection(PATIENT_MODEL)
+					.doc(patientId)
+					.set(patientData);
+				resolve();
 			} catch (error) {
 				reject(error);
 			}

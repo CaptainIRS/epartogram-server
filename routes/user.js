@@ -7,13 +7,12 @@ const User = require("../models/User");
 
 // Useless route, just to test if auth is working
 router.get("/", async (req, res) => {
-	const token = req.header("X-Token-Firebase");
-	try {
-		const claims = await auth.verifyIdToken(token);
-		const user = await auth.getUser(claims.uid);
-		return res.status(200).json(user);
-	} catch (error) {
-		return res.status(400).json(error);
+	if (req.user) {
+		res.status(200).json(req.user);
+	} else {
+		res.status(401).json({
+			error: "Unauthorized",
+		});
 	}
 });
 

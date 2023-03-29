@@ -1,4 +1,4 @@
-const { auth, firestore } = require("../firebase");
+const { auth, firestore } = require("../utils/firebase");
 
 const USER_COLLECTION = "users";
 
