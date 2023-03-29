@@ -4,7 +4,7 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 var cors = require("cors");
 require("dotenv").config();
-require("./firebase");
+// require("./firebase");
 
 const indexRouter = require("./routes/index");
 const authRouter = require("./routes/auth");

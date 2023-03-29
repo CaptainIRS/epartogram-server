@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
-const { auth } = require("../firebase");
+const { auth } = require("../utils/firebase");
 
 const User = require("../models/User");
 
 // Useless route, just to test if auth is working
 router.get("/", async (req, res) => {
-	const { token } = req.body;
+	const token = req.header("X-Token-Firebase");
 	try {
 		const claims = await auth.verifyIdToken(token);
 		const user = await auth.getUser(claims.uid);
