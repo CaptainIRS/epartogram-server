@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "emulators:start": "firebase emulators:start &",
+    "start": "FIREBASE_AUTH_EMULATOR_HOST=\"localhost:9099\" GCLOUD_PROJECT=\"e-partogram\" nodemon ./bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
