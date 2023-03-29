@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "emulators:start": "firebase emulators:start &",
-    "start": "FIREBASE_AUTH_EMULATOR_HOST=\"localhost:9099\" GCLOUD_PROJECT=\"e-partogram\" nodemon ./bin/www"
+    "start": "FIREBASE_AUTH_EMULATOR_HOST=\"localhost:9099\" FIRESTORE_EMULATOR_HOST=\"localhost:8088\" FIREBASE_DATABASE_EMULATOR_HOST=\"localhost:9009\" FIREBASE_STORAGE_EMULATOR_HOST=\"localhost:9199\" GCLOUD_PROJECT=\"e-partogram\" nodemon ./bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",

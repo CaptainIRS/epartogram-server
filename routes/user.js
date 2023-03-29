@@ -7,8 +7,8 @@ const { auth } = require('../firebase');
 router.get('/', async (req, res) => {
     const { token } = req.body;
     try {
-        const decodedToken = await auth.verifyIdToken(token);
-        const user = await auth.getUser(decodedToken.uid);
+        const claims = await auth.verifyIdToken(token);
+        const user = await auth.getUser(claims.uid);
         return res.status(200).json(user);
     } catch (error) {
         return res.status(400).json(error);
