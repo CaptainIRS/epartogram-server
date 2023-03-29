@@ -2,7 +2,8 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-
+var cors = require('cors');
+require('dotenv').config();
 require('./firebase');
 
 const indexRouter = require('./routes/index');
@@ -10,6 +11,11 @@ const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
 
 const app = express();
+
+app.use(cors({
+    origin: process.env.FRONTEND,
+    credentials: true
+}));
 
 app.use(logger('dev'));
 app.use(express.json());
