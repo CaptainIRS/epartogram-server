@@ -10,7 +10,11 @@ const { auth, firestore } = require("./utils/firebase");
 const indexRouter = require("./routes/index");
 const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
+<<<<<<< HEAD
 const patientRouter = require("./routes/patient");
+=======
+const adminRouter = require("./routes/admin");
+>>>>>>> d2716d3 (feat(admin): add admin routes)
 
 const app = express();
 
@@ -69,5 +73,6 @@ app.use("/", indexRouter);
 app.use("/auth", authRouter);
 app.use("/user", userRouter);
 app.use("/patient", patientRouter);
+app.use("/admin", adminRouter);
 
 module.exports = app;
