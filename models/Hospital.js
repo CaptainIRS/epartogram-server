@@ -56,7 +56,7 @@ class Hospital {
                     reject("User not found")
                 }
                 const user = userSnapshot.docs[0]
-                await document.collection(STAFFS_COLLECTION).doc(user.id).set({...user.data(),status: status})  
+                await document.collection(STAFFS_COLLECTION).doc(user.id).set({id: user.uid, status: status})  
 				resolve();
 			} catch (error) {
 				reject(error);
@@ -80,7 +80,7 @@ class Hospital {
     }
 
     static getOnDuty(id) {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async function (resolve, reject)  {
 			try {
                 const document = await firestore.collection(HOSPITAL_COLLECTION).doc(id)
                 const res = await document.get()
@@ -89,10 +89,12 @@ class Hospital {
                 }
                 const staffs = await document.collection(STAFFS_COLLECTION).where("status", "==", true).get()
                 var staffsList = []
-                staffs.forEach(doc => {
-                    staffsList.push(doc.data())
-                })
-                resolve(staffsList);
+               
+                for (const staff of staffs.docs) {
+                    const user = await firestore.collection(USER_COLLECTION).doc(staff.id).get()
+                    staffsList.push(user.data()) 
+                }
+                res(resolve(staffsList));    
 			} catch (error) {
 				reject(error);
 			}
