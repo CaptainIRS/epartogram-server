@@ -73,3 +73,4 @@ typings/
 .next
 
 serviceAccountKey.json
+sample.json
