@@ -49,7 +49,7 @@ router.post("/staff", async (req, res) => {
 		staffId,
         isActive,
 	} = req.body;
-    if (!staffId || !isActive) {
+    if (!staffId || isActive == undefined) {
 		res.status(400).json({ message: "Please enter all fields" });
 		return;
 	}
