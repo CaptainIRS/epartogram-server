@@ -4,7 +4,6 @@ const { distance } = require("../utils/haversine");
 
 const HOSPITAL_COLLECTION  = "hospitals";
 const USER_COLLECTION = "users";
-
 const STAFFS_COLLECTION  = "staffs";
 
 class Hospital {
@@ -47,15 +46,17 @@ class Hospital {
         return new Promise(async (resolve, reject) => {
 			try {
                 console.log(staffId)
-                // const user = await auth.getUser(staffId)
-                // if(!user.exists) {
-                //     reject("User not found")
-                // }
-                const document = await firestore.collection(HOSPITAL_COLLECTION ).doc(id)
+
+                const document = await firestore.collection(HOSPITAL_COLLECTION).doc(id)
                 if (!await document.get()) {
                     reject("Hospital not found")    
                 }
-                await document.collection(STAFFS_COLLECTION ).doc(staffId).set({status: status})  
+                const userSnapshot = await firestore.collection(USER_COLLECTION).where("uid","==",staffId).get()
+                if( userSnapshot.empty) {
+                    reject("User not found")
+                }
+                const user = userSnapshot.docs[0]
+                await document.collection(STAFFS_COLLECTION).doc(user.id).set({...user.data(),status: status})  
 				resolve();
 			} catch (error) {
 				reject(error);
@@ -78,15 +79,20 @@ class Hospital {
 		});
     }
 
-    static getAll(id) {
+    static getOnDuty(id) {
         return new Promise(async (resolve, reject) => {
 			try {
-                const document = await firestore.collection(HOSPITAL_COLLECTION ).doc(id)
+                const document = await firestore.collection(HOSPITAL_COLLECTION).doc(id)
                 const res = await document.get()
                 if (!res) {
                     reject("Hospital not found")    
                 }
-				resolve(res.data());
+                const staffs = await document.collection(STAFFS_COLLECTION).where("status", "==", true).get()
+                var staffsList = []
+                staffs.forEach(doc => {
+                    staffsList.push(doc.data())
+                })
+                resolve(staffsList);
 			} catch (error) {
 				reject(error);
 			}

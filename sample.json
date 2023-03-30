@@ -1,0 +1,17 @@
+{
+    "email": "mailmuhesh@gmail.com",
+    "password": "123456",
+    "role":"Admin",
+    "name": "Muhesh"
+}
+{
+    "name": "Muhesh Hospital",
+    "tier": 3,
+    "lat": 30.5,
+    "lon": 70.5,
+    "capacity": 100,
+}
+{
+    "staffId": "TXnRXzLyd5OMPxptkTNtzub1JNMO",
+    "isActive": false,
+}

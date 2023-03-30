@@ -10,8 +10,6 @@ router.use((req, res, next)  => {
         return res.status(401).json({message: "unauthorized"})
     }
     req.token = req.user.uid;
-    // const token = req.header("X-Token-Firebase");
-    // req.token = token;
     next()
 })
 
@@ -59,7 +57,7 @@ router.post("/staff", async (req, res) => {
         res.status(200).send({ message: "Success" });
 	} catch (err) {
 		console.log(err);
-		res.status(500).send({ message: "Error creating hospital" });
+		res.status(500).send({ message: "Error creating staff" });
 	}
 });
 
@@ -78,7 +76,7 @@ router.put("/staff", async (req, res) => {
         res.status(200).send({ message: "Success" });
 	} catch (err) {
 		console.log(err);
-		res.status(500).send({ message: "Error creating hospital" });
+		res.status(500).send({ message: "Error updating staff" });
 	}
 });
 
@@ -100,18 +98,18 @@ router.put("/capacity", async (req, res) => {
         res.status(200).send({ message: "Success" });
 	} catch (err) {
 		console.log(err);
-		res.status(500).send({ message: "Error creating hospital" });
+		res.status(500).send({ message: "Error occurred" });
 	}
 });
 
-router.get("/hospital", async (req, res) => {
+router.get("/onduty", async (req, res) => {
 	try {
         const admin = req.token;
-		const body = await Hospital.getAll(admin);
+		const body = await Hospital.getOnDuty(admin);
         res.status(200).send({ message: "Success", response: body });
 	} catch (err) {
 		console.log(err);
-		res.status(500).send({ message: "Error creating hospital" });
+		res.status(500).send({ message: "Error fetching staffs" });
 	}
 });
 
