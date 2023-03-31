@@ -26,7 +26,7 @@ router.post('/register', async (req, res) => {
             password
         });
         await auth.setCustomUserClaims(user.uid, { role });
-        await firestore.collection('users').add({
+        await firestore.collection('users').doc(user.uid).set({
             uid: user.uid,
             email,
             role,
@@ -43,15 +43,18 @@ router.get('/roles', function(req, res, next) {
 });
 
 router.post('/fcm-token', async (req, res) => {
-    const { token, fcmToken } = req.body;
-    if (!token || !fcmToken) {
+    if (!req.user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const { fcmToken } = req.body;
+    if (!fcmToken) {
         return res.status(400).json({ error: 'Missing fields' });
     }
     try {
-        const claims = await auth.verifyIdToken(token);
-        await firestore.collection('users').doc(claims.uid).update({
+        await firestore.collection('users').doc(req.user.uid).update({
             fcmToken
         });
+        return res.status(200).json({ message: 'Token updated' });
     } catch (error) {
         return res.status(400).json(error);
     }
