@@ -206,9 +206,9 @@ router.get("/:id", async (req, res) => {
 		);
 		// res.json(patient);
 		console.log(risks, suggestions);
-		return res.json({ risks, suggestions, patientData });
+		return res.json({ risks, suggestions, patient });
 	} catch (err) {
-		console.log(err);
+		console.log("patient.js", err);
 		return res.status(500).json({ message: "Error getting patient" });
 	}
 });

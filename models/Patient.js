@@ -49,9 +49,30 @@ class Patient {
 		];
 	}
 
+	static #getUserFromId(uid) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				const snapshot = await firestore
+					.collection("users")
+					.where("uid", "==", uid)
+					.get();
+				// if (!snapshot.exists) {
+				// 	reject(`User not found with uid ${uid}`);
+				// }
+				const user = snapshot.docs[0];
+				resolve({ id: user.id, ...user.data() });
+
+				// resolve({ id: snapshot.id, ...snapshot.data() });
+			} catch (error) {
+				reject(error);
+			}
+		});
+	}
+
 	static findById(patientId) {
 		return new Promise(async (resolve, reject) => {
 			try {
+				console.log(patientId);
 				const snapshot = await firestore
 					.collection(PATIENT_MODEL)
 					.doc(patientId)
@@ -59,7 +80,27 @@ class Patient {
 				if (!snapshot.exists) {
 					reject("Patient not found");
 				}
-				resolve({ id: snapshot.id, ...snapshot.data() });
+				const patient = { id: snapshot.id, ...snapshot.data() };
+				console.log(patient);
+				patient.doctor = await this.#getUserFromId(patient.doctor);
+				patient.nurse = await this.#getUserFromId(patient.nurse);
+				for (const key in patient["measurements"]) {
+					patient["measurements"][key] = await Promise.all(
+						patient["measurements"][key].map(
+							async (measurement) => {
+								console.log(measurement);
+								return {
+									...measurement,
+									recordedBy: await this.#getUserFromId(
+										measurement.recordedBy
+									),
+								};
+							}
+						)
+					);
+					console.log(patient["measurements"][key]);
+				}
+				resolve(patient);
 			} catch (error) {
 				reject(error);
 			}

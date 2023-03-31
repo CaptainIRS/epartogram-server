@@ -57,7 +57,7 @@ app.use(async (req, res, next) => {
 			user.hospital = userData.hospital || "TODO FIX HOSPITAL";
 			req.user = user;
 		} catch (error) {
-			console.log(error);
+			console.log("app.js", error);
 			return res.status(400).json(error);
 		}
 	}
