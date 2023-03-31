@@ -128,6 +128,39 @@ class Hospital {
 		});
     }
 
+    static setOnDuty(id, staffId) {
+        return new Promise(async function (resolve, reject)  {
+            try {
+                const document = firestore.collection(HOSPITAL_COLLECTION).doc(id)
+                const res = await document.get()
+                if (!res) {
+                    reject("Hospital not found")
+                }
+                var query = firestore.collection(STAFFS_COLLECTION)
+                query = query.where("hospital","==",id)
+                query = query.where("staff","==",staffId)
+                const staffs = await query.get()
+                if (staffs.empty) {
+                    reject("Staff not found")
+                }
+                // Set all staffs to off duty
+                const allStaffs = await firestore.collection(STAFFS_COLLECTION)
+                    .where("hospital","==",id)
+                    .where("status","==",true)
+                    .get()
+                for (const staff of allStaffs.docs) {
+                    await firestore.collection(STAFFS_COLLECTION).doc(staff.id).update({status: false})
+                }
+                // Set the selected staff to on duty
+                const staff = staffs.docs[0]
+                await firestore.collection(STAFFS_COLLECTION).doc(staff.id).update({status: true})
+                resolve()
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
     static getSuggestions(id) {
         return new Promise(async (resolve, reject) => {
 			try {

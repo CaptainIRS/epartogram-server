@@ -19,10 +19,4 @@ router.get("/", async (req, res) => {
 	}
 });
 
-router.get("/onduty", async (req, res) => {
-	const doctorsOnDuty = await User.getOnDuty("Doctor");
-	const nursesOnDuty = await User.getOnDuty("Nurse");
-	return res.status(200).json({ doctorsOnDuty, nursesOnDuty });
-});
-
 module.exports = router;

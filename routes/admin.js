@@ -113,6 +113,22 @@ router.get("/onduty", async (req, res) => {
 	}
 });
 
+router.post("/onduty", async (req, res) => {
+	try {
+		const admin = req.token;
+		const { staffId } = req.body;
+		if (!staffId) {
+			res.status(400).json({ message: "Please enter all fields" });
+			return;
+		}
+		await Hospital.setOnDuty(admin, staffId);
+		res.status(200).send({ message: "Success" });
+	} catch (err) {
+		console.log(err);
+		res.status(500).send({ message: "Error occurred while setting staff on duty" });
+	}
+});
+
 router.get("/nearbyhospitals", async (req, res) => {
 	try {
         const admin = req.token;
