@@ -45,9 +45,11 @@ const validateNewPatient = (req) => {
 	if (contractionStartTime > Date.now()) {
 		errors.push("Contraction start time must be in the past");
 	}
-    if(contractionStartTime >= membraneRuptureTime){
-        errors.push("Contraction start time must be less than membrane rupture time");
-    }
+	if (contractionStartTime >= membraneRuptureTime) {
+		errors.push(
+			"Contraction start time must be less than membrane rupture time"
+		);
+	}
 
 	return errors;
 };
@@ -123,7 +125,7 @@ const validatePatient = async (patient) => {
 			}
 		}
 
-		if (measurements.cervix && measurements.cervix.length > 0) {
+		if (measurements.cervix && measurements.cervix.length > 1) {
 			// calculate rate of cervical dilation
 			// if rate is > 1cm/hour, suggest to call doctor
 			// if rate is > 2cm/hour, suggest to call doctor immediately
@@ -139,7 +141,6 @@ const validatePatient = async (patient) => {
 			if (rate < 0.2) {
 				suggestions.push("Call doctor immediately");
 				risks.push("Very low rate of cervical dilation");
-				console.log("SENT MESSAGE alert");
 			} else if (rate < 1) {
 				suggestions.push("Monitor patient closely");
 				risks.push("Low rate of cervical dilation");

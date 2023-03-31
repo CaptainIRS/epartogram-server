@@ -166,7 +166,14 @@ router.post("/addmeasurement", async (req, res) => {
 					recordedBy: req.user.id,
 					timeStamp,
 				});
-				await Patient.addMeasurement(patientId, patient);
+				const newPatient = await Patient.addMeasurement(
+					patientId,
+					patient
+				);
+				const { risks, suggestions, patientData } =
+					await validatePatient(newPatient);
+				const critical = risks.length;
+				await Patient.updateParameter(patientId, "critical", critical);
 			}
 		} catch (err) {
 			console.log(err);
@@ -174,6 +181,7 @@ router.post("/addmeasurement", async (req, res) => {
 			return;
 		}
 	}
+
 	res.status(201).json({
 		message: "Measurement added",
 	});

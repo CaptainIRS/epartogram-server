@@ -33,6 +33,7 @@ class Patient {
 		this.doctor = doctor;
 		this.nurse = nurse;
 		this.hospital = hospital;
+		this.critical = 0;
 	}
 
 	static getRiskFactors() {
@@ -101,6 +102,7 @@ class Patient {
 					nurse: this.nurse,
 					hospital: this.hospital,
 					active: true,
+					critical: 0,
 				});
 				resolve();
 			} catch (error) {
@@ -147,7 +149,11 @@ class Patient {
 					.collection(PATIENT_MODEL)
 					.doc(patientId)
 					.set(patientData);
-				resolve();
+				const snapshot = await firestore
+					.collection(PATIENT_MODEL)
+					.doc(patientId)
+					.get();
+				resolve({ id: snapshot.id, ...snapshot.data() });
 			} catch (error) {
 				reject(error);
 			}
@@ -204,6 +210,19 @@ class Patient {
 					.collection(PATIENT_MODEL)
 					.doc(patientId)
 					.update({ comments, active: false });
+				resolve();
+			} catch (error) {
+				reject(error);
+			}
+		});
+	}
+	static updateParameter(patientId, parameter, value) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				await firestore
+					.collection(PATIENT_MODEL)
+					.doc(patientId)
+					.update({ [parameter]: value });
 				resolve();
 			} catch (error) {
 				reject(error);
