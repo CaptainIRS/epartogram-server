@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
 
-const { auth } = require("../utils/firebase");
-
 const Hospital = require("../models/Hospital");
 
 router.use((req, res, next)  => {
@@ -136,7 +134,7 @@ router.get("/nearbyhospitals", async (req, res) => {
         res.status(200).send({ message: "Success", response: body });
 	} catch (err) {
 		console.log(err);
-		res.status(400).send(err);
+		res.status(400).send({ message: "Error fetching hospitals" });
 	}
 });
 
@@ -147,7 +145,7 @@ router.get("/patients", async (req, res) => {
         res.status(200).send({ message: "Success", response: body });
 	} catch (err) {
 		console.log(err);
-		res.status(400).send(err);
+		res.status(400).send({ message: "Error fetching patients" });
 	}
 });
 
@@ -161,8 +159,20 @@ router.get("/transferpatient", async (req, res) => {
         res.status(200).send({ message: "Success", response: body });
 	} catch (err) {
 		console.log(err);
-		res.status(400).send(err);
+		res.status(400).send({ message: "Error changing patients" });
 	}
 });
+
+router.get("/liststaffs", async (req, res) => {
+    const admin = req.token;
+	try {
+		const body = await Hospital.getUnAssignedStaffs(admin);
+        res.status(200).send({ message: "Success", response: body });
+	} catch (err) {
+		console.log(err);
+		res.status(400).send({ message: "Error getting staffs" });
+	}
+});
+
 
 module.exports = router;

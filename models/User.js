@@ -56,7 +56,7 @@ class User {
 					password: this.password,
 				});
 				await auth.setCustomUserClaims(user.uid, { role: this.role });
-				await firestore.collection(USER_COLLECTION).add({
+				await firestore.collection(USER_COLLECTION).doc(user.uid).set({
 					uid: user.uid,
 					email: this.email,
 					role: this.role,

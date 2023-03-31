@@ -29,7 +29,7 @@ class Hospital {
                 if (document.get().exists) {
                     reject("Hospital already exists")    
                 }     
-				await firestore.collection(HOSPITAL_COLLECTION ).doc(id).set({
+				await firestore.collection(HOSPITAL_COLLECTION).doc(id).set({
 					name: this.name,
                     tier: this.tier,
                     capacity: this.capacity,
@@ -46,18 +46,32 @@ class Hospital {
     static addStaff(id, staffId, status) {
         return new Promise(async (resolve, reject) => {
 			try {
-                console.log(staffId)
-
                 const document = firestore.collection(HOSPITAL_COLLECTION).doc(id)
                 if (!await document.get()) {
                     reject("Hospital not found")    
                 }
+                
                 const userSnapshot = await firestore.collection(USER_COLLECTION).where("uid","==",staffId).get()
                 if(userSnapshot.empty) {
                     reject("User not found")
                 }
                 const user = userSnapshot.docs[0]
-                console.log(user.data())
+                if(user.data().role !== "Nurse") {
+                    var nurses = await document.get().nurses
+                    if(!nurses) {
+                        nurses = []
+                    }
+                    nurses.push(user.data().uid)
+                    await document.update({nurses: nurses})
+                } else if(user.data().role !== "Doctor") {
+                    var doctors = await document.get().doctors
+                    if(!doctors) {
+                        doctors = []
+                    }
+                    doctors.push(user.data().uid)
+                    await document.update({doctors: doctors})
+                }
+               
                 await firestore.collection(STAFFS_COLLECTION).doc(user.id).set({staff: user.data().uid, hospital: id, status: status})  
 				resolve();
 			} catch (error) {
@@ -80,7 +94,10 @@ class Hospital {
                     reject("User not found")
                 }
                 const user = userSnapshot.docs[0]
-                await firestore.collection(STAFFS_COLLECTION).doc(user.id).update({staff: user.data().uid, status: status})  
+                if(!status){
+                    id = "NONE"
+                }
+                await firestore.collection(STAFFS_COLLECTION).doc(user.id).update({staff: user.data().uid, hospital: id, status: status})  
 				resolve();
 			} catch (error) {
 				reject(error);
@@ -160,6 +177,29 @@ class Hospital {
             }
         });
     }
+    static getUnAssignedStaffs(id) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				const document = firestore.collection(HOSPITAL_COLLECTION).doc(id);
+                const res = await document.get();
+                const nurses = res.nurses;
+                if(!nurses) nurses = []
+                const doctors = res.doctors;
+                if(!doctors) doctors = []
+                const userSnapshots = firestore.collection(USER_COLLECTION).get();
+                for(const user of userSnapshots.docs) {
+                    if(user.data().role === "Nurse" && !nurses.includes(user.data().uid)) {
+                        nurses.push(user.data())
+                    } else if(user.data().role === "Doctor" && !doctors.includes(user.data().uid)) {
+                        doctors.push(user.data())
+                    }
+                }
+				resolve({nurses: nurses, doctors: doctors});
+			} catch (error) {
+				reject(error);
+			}
+		});
+	}
 
     static getSuggestions(id) {
         return new Promise(async (resolve, reject) => {
