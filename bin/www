@@ -7,7 +7,7 @@
 const app = require('../app');
 const debug = require('debug')('epartogram:server');
 const http = require('http');
-
+const { grpcServer, serverCredentials } = require('../rpcs/rpc');
 /**
  * Get port from environment and store in Express.
  */
@@ -25,7 +25,19 @@ const server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
+grpcServer.bindAsync(
+    //port to serve on
+    "127.0.0.1:5000", serverCredentials,
+    (error, port) => {
+        console.log("grpc Server running at port 5000");
+        grpcServer.start();
+ });
+
+ 
+server.listen(port,()=> {   
+        console.log(`http server running at port 5005`);
+});
+
 server.on('error', onError);
 server.on('listening', onListening);
 

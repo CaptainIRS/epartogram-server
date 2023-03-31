@@ -53,7 +53,7 @@ router.post("/staff", async (req, res) => {
 	}
 	try {
         const admin = req.token;
-		await Hospital.modifyStaff(admin, staffId, isActive);
+		await Hospital.addStaff(admin, staffId, isActive);
         res.status(200).send({ message: "Success" });
 	} catch (err) {
 		console.log(err);
@@ -113,14 +113,39 @@ router.get("/onduty", async (req, res) => {
 	}
 });
 
-router.get("/suggestion", async (req, res) => {
+router.get("/nearbyhospitals", async (req, res) => {
 	try {
         const admin = req.token;
 		const body = await Hospital.getSuggestions(admin);
         res.status(200).send({ message: "Success", response: body });
 	} catch (err) {
 		console.log(err);
-		res.status(500).send({ message: "Error creating hospital" });
+		res.status(400).send(err);
+	}
+});
+
+router.get("/patients", async (req, res) => {
+	try {
+        const admin = req.token;
+		const body = await Hospital.getPatients(admin);
+        res.status(200).send({ message: "Success", response: body });
+	} catch (err) {
+		console.log(err);
+		res.status(400).send(err);
+	}
+});
+
+router.get("/transferpatient", async (req, res) => {
+    const {
+		patient,
+        toHospital
+	} = req.body;
+	try {
+		const body = await Hospital.transferPatient(patient, toHospital);
+        res.status(200).send({ message: "Success", response: body });
+	} catch (err) {
+		console.log(err);
+		res.status(400).send(err);
 	}
 });
 

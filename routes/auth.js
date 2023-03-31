@@ -4,20 +4,20 @@ const router = express.Router();
 const { auth, firestore, appCheck } = require('../utils/firebase');
 
 router.post('/register', async (req, res) => {
-    const appCheckToken = req.header('X-Firebase-AppCheck');
-    if (!appCheckToken) {
-        return res.status(400).json({ error: 'Missing App Check token' });
-    }
-    try {
-        await appCheck.verifyToken(appCheckToken);
-    } catch (error) {
-        return res.status(400).json(error);
-    }
+    // const appCheckToken = req.header('X-Firebase-AppCheck');
+    // if (!appCheckToken) {
+    //     return res.status(400).json({ error: 'Missing App Check token' });
+    // }
+    // try {
+    //     await appCheck.verifyToken(appCheckToken);
+    // } catch (error) {
+    //     return res.status(400).json(error);
+    // }
     const { email, password, role, name } = req.body;
     if (!email || !password || !role || !name) {
         return res.status(400).json({ error: 'Missing fields' });
     }
-    if (role !== 'Admin' && role !== 'Doctor' && role !== 'Patient') {
+    if (role !== 'Admin' && role !== 'Doctor' && role !== 'Nurse') {
         return res.status(400).json({ error: 'Invalid role' });
     }
     try {

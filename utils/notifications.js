@@ -17,6 +17,23 @@ const sendNotificationToUser = async (email, message) => {
     }
 };
 
+const sendNotificationToUserByUID = async (uid, message) => {
+    const userSnapshot = await firestore.collection("users").where("uid","==",uid).get();
+    const user = userSnapshot.docs[0]
+    const fcmToken = user.data().fcmToken;
+
+    const payload = {
+        message,
+        token: fcmToken
+    };
+
+    try {
+        await fcm.send(payload);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 const sendNotificationToRole = async (role, message) => {
     const users = await firestore.collection("users").where("role", "==", role).get();
     const fcmTokens = users.docs.map(user => user.data().fcmToken);
@@ -52,5 +69,6 @@ const sendNotificationToAll = async (message) => {
 module.exports = {
     sendNotificationToUser,
     sendNotificationToRole,
-    sendNotificationToAll
+    sendNotificationToAll,
+    sendNotificationToUserByUID
 };

@@ -100,6 +100,7 @@ class Patient {
 					doctor: this.doctor,
 					nurse: this.nurse,
 					hospital: this.hospital,
+                    active: true
 				});
 				resolve();
 			} catch (error) {
@@ -107,6 +108,20 @@ class Patient {
 			}
 		});
 	}
+
+    static updateActiveStatus(patientId, active) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                await firestore
+                    .collection(PATIENT_MODEL)
+                    .doc(patientId)
+                    .update({ active });
+                resolve();
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
 
 	static getAll() {
 		return new Promise(async (resolve, reject) => {
@@ -133,6 +148,40 @@ class Patient {
 					.doc(patientId)
 					.set(patientData);
 				resolve();
+			} catch (error) {
+				reject(error);
+			}
+		});
+	}
+
+    static checkAllPatients() {
+		return new Promise(async (resolve, reject) => {
+			try {
+				const patientsRecords = await firestore.collection(PATIENT_MODEL).where("active", "==", true).get();
+                const notifcationDatas = [];
+                for(const patientRecord of patientsRecords.docs) {
+                    const patient = patientRecord.data()
+                    const measurements = patient.measurements;
+                    if(!measurements) continue;
+                    for(const measurement  in  measurements) {
+                        const measurementData = measurements[measurement];
+                        const measurementDataLength = measurementData.length;
+                        if(measurementDataLength == 0) continue;
+                        const lastMeasurement = measurementData[measurementDataLength - 1];
+                        const curTimeStamp = Date.now();
+                        if(Math.ceil((curTimeStamp - lastMeasurement.timeStamp)/60/1000) > 31) {
+                        notifcationDatas.push({
+                            patientId: patientRecord.id,
+                            patientName: patient.name,
+                            nurse: patient.nurse,
+                            measurementName: measurementData.name,
+                        });
+                        break;
+                    }
+                    }
+
+                }
+				resolve(notifcationDatas);
 			} catch (error) {
 				reject(error);
 			}

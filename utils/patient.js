@@ -45,6 +45,9 @@ const validateNewPatient = (req) => {
 	if (contractionStartTime > Date.now()) {
 		errors.push("Contraction start time must be in the past");
 	}
+    if(contractionStartTime >= membraneRuptureTime){
+        errors.push("Contraction start time must be less than membrane rupture time");
+    }
 
 	return errors;
 };

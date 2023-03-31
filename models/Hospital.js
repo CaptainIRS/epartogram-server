@@ -5,6 +5,7 @@ const { distance } = require("../utils/haversine");
 const HOSPITAL_COLLECTION  = "hospitals";
 const USER_COLLECTION = "users";
 const STAFFS_COLLECTION  = "staffs";
+const PATIENT_COLLECTION = "patients";
 
 class Hospital {
     constructor({
@@ -24,7 +25,7 @@ class Hospital {
     addHospital(id) {
         return new Promise(async (resolve, reject) => {
 			try {
-                const document = await firestore.collection(HOSPITAL_COLLECTION ).doc(id)
+                const document = firestore.collection(HOSPITAL_COLLECTION ).doc(id)
                 if (document.get().exists) {
                     reject("Hospital already exists")    
                 }     
@@ -42,12 +43,35 @@ class Hospital {
 		});
     }
 
+    static addStaff(id, staffId, status) {
+        return new Promise(async (resolve, reject) => {
+			try {
+                console.log(staffId)
+
+                const document = firestore.collection(HOSPITAL_COLLECTION).doc(id)
+                if (!await document.get()) {
+                    reject("Hospital not found")    
+                }
+                const userSnapshot = await firestore.collection(USER_COLLECTION).where("uid","==",staffId).get()
+                if(userSnapshot.empty) {
+                    reject("User not found")
+                }
+                const user = userSnapshot.docs[0]
+                console.log(user.data())
+                await firestore.collection(STAFFS_COLLECTION).doc(user.id).set({staff: user.data().uid, hospital: id, status: status})  
+				resolve();
+			} catch (error) {
+				reject(error);
+			}
+		});
+    }
+
     static modifyStaff(id, staffId, status) {
         return new Promise(async (resolve, reject) => {
 			try {
                 console.log(staffId)
 
-                const document = await firestore.collection(HOSPITAL_COLLECTION).doc(id)
+                const document = firestore.collection(HOSPITAL_COLLECTION).doc(id)
                 if (!await document.get()) {
                     reject("Hospital not found")    
                 }
@@ -56,7 +80,7 @@ class Hospital {
                     reject("User not found")
                 }
                 const user = userSnapshot.docs[0]
-                await document.collection(STAFFS_COLLECTION).doc(user.id).set({id: user.uid, status: status})  
+                await firestore.collection(STAFFS_COLLECTION).doc(user.id).update({staff: user.data().uid, status: status})  
 				resolve();
 			} catch (error) {
 				reject(error);
@@ -67,7 +91,7 @@ class Hospital {
     static modifyCapacity(id, capacity) {
         return new Promise(async (resolve, reject) => {
 			try {
-                const document = await firestore.collection(HOSPITAL_COLLECTION ).doc(id)
+                const document = firestore.collection(HOSPITAL_COLLECTION).doc(id)
                 if (!await document.get()) {
                     reject("Hospital not found")    
                 }
@@ -82,12 +106,15 @@ class Hospital {
     static getOnDuty(id) {
         return new Promise(async function (resolve, reject)  {
 			try {
-                const document = await firestore.collection(HOSPITAL_COLLECTION).doc(id)
+                const document = firestore.collection(HOSPITAL_COLLECTION).doc(id)
                 const res = await document.get()
                 if (!res) {
                     reject("Hospital not found")    
                 }
-                const staffs = await document.collection(STAFFS_COLLECTION).where("status", "==", true).get()
+                var query = firestore.collection(STAFFS_COLLECTION)
+                query = query.where("hospital","==",id)
+                query = query.where("status","==",true)
+                const staffs = await query.get()
                 var staffsList = []
                
                 for (const staff of staffs.docs) {
@@ -104,12 +131,13 @@ class Hospital {
     static getSuggestions(id) {
         return new Promise(async (resolve, reject) => {
 			try {
+                console.log(new Date())
                 const currentHospitalDocument = await firestore.collection(HOSPITAL_COLLECTION ).doc(id).get()
                 if (!currentHospitalDocument) {
                     reject("Hospital not found")    
                 }
                 const currentHospital = currentHospitalDocument.data()
-                const allHospitals = await firestore.collection(HOSPITAL_COLLECTION ).get()
+                const allHospitals = await firestore.collection(HOSPITAL_COLLECTION).get()
                 var selectedHospitals = new PriorityQueue();
                 allHospitals.forEach(doc => {
                     const newHospital = doc.data()
@@ -117,10 +145,39 @@ class Hospital {
                     {
                         const dist = distance(currentHospital.lat, currentHospital.lon, newHospital.lat, newHospital.lon)
                         console.log(dist,newHospital)
-                        selectedHospitals.enqueue(newHospital, dist);
+                        selectedHospitals.enqueue({id:doc.id, ...newHospital}, dist);
                     }
                 });
-                resolve(selectedHospitals.listQueue());
+                resolve({...currentHospital, nearby: selectedHospitals.listQueue()});
+			} catch (error) {
+				reject(error);
+			}
+		});
+    }
+
+    static getPatients(id) {
+        return new Promise(async (resolve, reject) => {
+			try {
+                var query = firestore.collection(PATIENT_COLLECTION)
+                query = query.where("hospital","==",id)
+                query = query.where("active","==",true)
+                const patients = await query.get()
+                var patientsList = []
+                for (const patient of patients.docs) {
+                    patientsList.push({id: patient.id, ...patient.data()})
+                }
+                resolve(patientsList);
+			} catch (error) {
+				reject(error);
+			}
+		});
+    }
+
+    static transferPatient(patientId, hospitalId) {
+        return new Promise(async (resolve, reject) => {
+			try {
+                await firestore.collection(PATIENT_COLLECTION).doc(patientId).update({hospital: hospitalId})
+                resolve();
 			} catch (error) {
 				reject(error);
 			}

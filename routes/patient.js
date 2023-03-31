@@ -30,9 +30,10 @@ router.post("/add", async (req, res) => {
 		height,
 		doctor,
 		nurse,
+        hospital
 	} = req.body;
 
-	const hospital = req.user.hospital;
+	// const hospital = req.user.hospital;
 
 	if (
 		typeof name === "undefined" ||
@@ -144,7 +145,7 @@ router.post("/addmeasurement", async (req, res) => {
 
 			if (measurementName === "urine") {
 				const { volume, albumin, glucose, acetone, voimitus } =
-					req.body;
+					req.body.urine;
 
 				patient["measurements"][measurementName].push({
 					volume,
