@@ -40,7 +40,6 @@ app.use(async (req, res, next) => {
 				.collection("users")
 				.where("uid", "==", uid)
 				.get();
-			// console.log(userDoc);
 			const userDocData = [];
 			userDoc.forEach((doc) => {
 				userDocData.push({ id: doc.id, ...doc.data() });
@@ -54,9 +53,8 @@ app.use(async (req, res, next) => {
 			const userData = userDocData[0];
 			user.role = userData.role;
 			user.name = userData.name;
-			user.id = userData.id;
+			user.id = userData.uid;
 			user.hospital = userData.hospital || "TODO FIX HOSPITAL";
-			// console.log(user);
 			req.user = user;
 		} catch (error) {
 			console.log(error);

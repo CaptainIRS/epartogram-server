@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const functions = require('firebase-functions');
+const functions = require("firebase-functions");
 
 const { validateNewPatient, validatePatient } = require("../utils/patient");
 
@@ -30,7 +30,7 @@ router.post("/add", async (req, res) => {
 		height,
 		doctor,
 		nurse,
-        hospital
+		hospital,
 	} = req.body;
 
 	// const hospital = req.user.hospital;
@@ -179,6 +179,17 @@ router.post("/addmeasurement", async (req, res) => {
 	});
 });
 
+router.post("/:id/discharge", async (req, res) => {
+	const { id } = req.params;
+	const { comments } = req.body;
+	try {
+		await Patient.discharge(id, comments);
+		return res.status(200).json({ message: "Patient discharged" });
+	} catch (err) {
+		console.log(err);
+		return res.status(500).send({ message: "Error discharging patient" });
+	}
+});
 router.get("/:id", async (req, res) => {
 	try {
 		const patient = await Patient.findById(req.params.id);
