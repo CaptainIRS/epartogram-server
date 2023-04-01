@@ -61,8 +61,10 @@ class Hospital {
 				}
 				
 				const user = userSnapshot.docs[0];
+                const hospital = await document.get()
+                console.log(hospital.data())
 				if (user.data().role === "Nurse") {
-					var nurses = await document.get().nurses;
+					var nurses =  hospital.data().nurses;
 					if (!nurses) {
 						nurses = [];
 					}
@@ -71,7 +73,7 @@ class Hospital {
 					}
 					await document.update({ nurses: nurses });
 				} else if (user.data().role === "Doctor") {
-					var doctors = await document.get().doctors;
+					var doctors = hospital.data().doctors;
 					if (!doctors) {
 						doctors = [];
 					}
@@ -239,28 +241,36 @@ class Hospital {
 				const document = firestore
 					.collection(HOSPITAL_COLLECTION)
 					.doc(id);
+
 				const res = await document.get();
-				var nurses = res.nurses;
+
+				var nurses = res.data().nurses;
 				if (!nurses) nurses = [];
-				var doctors = res.doctors;
+
+				var doctors = res.data().doctors;
 				if (!doctors) doctors = [];
+
 				const snapshots = await firestore
 					.collection(USER_COLLECTION)
 					.get();
+
+                var resNurses = []
+                var resDoctors = []
 				for (const user of snapshots.docs) {
 					if (
 						user.data().role === "Nurse" &&
 						!nurses.includes(user.data().uid)
 					) {
-						nurses.push(user.data());
+						resNurses.push(user.data());
 					} else if (
 						user.data().role === "Doctor" &&
 						!doctors.includes(user.data().uid)
 					) {
-						doctors.push(user.data());
+						resDoctors.push(user.data());
 					}
+                    console.log(resDoctors,resNurses)
 				}
-				resolve({ nurses: nurses, doctors: doctors });
+				resolve({ nurses: resNurses, doctors: resDoctors });
 			} catch (error) {
 				reject(error);
 			}
@@ -287,7 +297,7 @@ class Hospital {
 					const newHospital = doc.data();
 					if (
 						doc.id !== id &&
-						newHospital.tier < currentHospital.tier
+						newHospital.tier > currentHospital.tier
 					) {
 						const dist = distance(
 							currentHospital.lat,

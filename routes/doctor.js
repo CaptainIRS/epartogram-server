@@ -7,10 +7,10 @@ const Patient = require("../models/Patient");
 router.use((req, res, next) => {
 	if (!req.user) {
 		return res.status(401).json({
-			message: "Unauthorized Accessing Admin Routes",
+			message: "Unauthorized Accessing Doctor Routes",
 		});
 	}
-	if (req.user.role !== "Admin") {
+	if (req.user.role !== "Doctor") {
 		return res.status(401).json({ message: "unauthorized" });
 	}
 	req.token = req.user.uid;
