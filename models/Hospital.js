@@ -31,6 +31,8 @@ class Hospital {
 					capacity: this.capacity,
 					lat: this.lat,
 					lon: this.lon,
+					nurses: [],
+					doctors: [],
 				});
 				resolve();
 			} catch (error) {
@@ -48,14 +50,16 @@ class Hospital {
 				if (!(await document.get())) {
 					reject("Hospital not found");
 				}
-
+				console.log(staffId);
 				const userSnapshot = await firestore
 					.collection(USER_COLLECTION)
 					.where("uid", "==", staffId)
 					.get();
-				if (userSnapshot.empty) {
+                console.log(userSnapshot.docs.length)
+				if (userSnapshot.docs.length<1) {
 					reject("User not found");
 				}
+				
 				const user = userSnapshot.docs[0];
 				if (user.data().role === "Nurse") {
 					var nurses = await document.get().nurses;
@@ -106,9 +110,10 @@ class Hospital {
 					.collection(USER_COLLECTION)
 					.where("uid", "==", staffId)
 					.get();
-				if (userSnapshot.empty) {
+				if (userSnapshot.docs.length<1) {
 					reject("User not found");
 				}
+				console.log("STATUS",status)
 				const user = userSnapshot.docs[0];
 				if (!status) {
 					id = "NONE";
@@ -125,6 +130,20 @@ class Hospital {
 			} catch (error) {
 				reject(error);
 			}
+		});
+	}
+
+	static getStaffHospitalId(userId) {
+		return new Promise(async (resolve, reject) => {
+             try {
+				const staff = await firestore.collection(STAFFS_COLLECTION).doc(userId).get()
+				if(!staff.exists){
+                  reject("No Staff Found")
+				}
+				resolve(staff.data().hospital)
+			 }catch(error){
+				reject(error);
+			 }
 		});
 	}
 
@@ -156,8 +175,6 @@ class Hospital {
 					reject("Hospital not found");
 				}
 				var query = firestore.collection(STAFFS_COLLECTION);
-				query = query.where("hospital", "==", id);
-				query = query.where("status", "==", true);
 				const staffs = await query.get();
 				var staffsList = [];
 
@@ -223,14 +240,14 @@ class Hospital {
 					.collection(HOSPITAL_COLLECTION)
 					.doc(id);
 				const res = await document.get();
-				const nurses = res.nurses;
+				var nurses = res.nurses;
 				if (!nurses) nurses = [];
-				const doctors = res.doctors;
+				var doctors = res.doctors;
 				if (!doctors) doctors = [];
-				const userSnapshots = firestore
+				const snapshots = await firestore
 					.collection(USER_COLLECTION)
 					.get();
-				for (const user of userSnapshots.docs) {
+				for (const user of snapshots.docs) {
 					if (
 						user.data().role === "Nurse" &&
 						!nurses.includes(user.data().uid)
@@ -307,20 +324,6 @@ class Hospital {
 					patientsList.push({ id: patient.id, ...patient.data() });
 				}
 				resolve(patientsList);
-			} catch (error) {
-				reject(error);
-			}
-		});
-	}
-
-	static transferPatient(patientId, hospitalId) {
-		return new Promise(async (resolve, reject) => {
-			try {
-				await firestore
-					.collection(PATIENT_COLLECTION)
-					.doc(patientId)
-					.update({ hospital: hospitalId });
-				resolve();
 			} catch (error) {
 				reject(error);
 			}

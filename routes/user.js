@@ -19,4 +19,14 @@ router.get("/", async (req, res) => {
 	}
 });
 
+router.get("/onduty", async (req, res) => {
+	try {
+		const body = await User.getOnDuty(req.user.hospital);
+		res.status(200).send({ message: "Success", response: body });
+	} catch (err) {
+		console.log(err);
+		res.status(400).send({ message: "Error getting staffs" });
+	}
+});
+
 module.exports = router;

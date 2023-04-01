@@ -12,6 +12,9 @@ const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
 const patientRouter = require("./routes/patient");
 const adminRouter = require("./routes/admin");
+const doctorRouter = require("./routes/doctor");
+
+const Hospital = require('./models/Hospital');
 
 const app = express();
 
@@ -55,6 +58,11 @@ app.use(async (req, res, next) => {
 			user.name = userData.name;
 			user.id = userData.uid;
 			user.hospital = userData.hospital || "TODO FIX HOSPITAL";
+			if(user.role == "Admin") {
+				user.hospital = user.uid
+			} else {
+				user.hospital = await Hospital.getStaffHospitalId(userDocData[0].id)
+			}
 			req.user = user;
 		} catch (error) {
 			console.log("app.js", error);
@@ -69,5 +77,6 @@ app.use("/auth", authRouter);
 app.use("/user", userRouter);
 app.use("/patient", patientRouter);
 app.use("/admin", adminRouter);
+app.use("/doctor", doctorRouter);
 
 module.exports = app;

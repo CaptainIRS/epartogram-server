@@ -1,6 +1,8 @@
 const { auth, firestore } = require("../utils/firebase");
 
 const USER_COLLECTION = "users";
+const HOSPITAL_COLLECTION = "hospitals";
+const STAFFS_COLLECTION = "staffs";
 
 class User {
 	keysAllowed = ["email", "password", "role", "name", "hospital"];
@@ -30,18 +32,32 @@ class User {
 			}
 		});
 	}
-
-	static getOnDuty(role) {
-		// get all users with role and onDuty = true
+	
+	static getOnDuty(id) {		// get all users with role and onDuty = true
 		return new Promise(async (resolve, reject) => {
 			try {
-				const userRef = await firestore
-					.collection(USER_COLLECTION)
-					.where("role", "==", role)
-					.where("onDuty", "==", true)
-					.get();
-				const users = userRef.docs.map((doc) => doc.data());
-				resolve(users);
+				const document = firestore
+					.collection(HOSPITAL_COLLECTION)
+					.doc(id);
+				const res = await document.get();
+				if (!res) {
+					reject("Hospital not found");
+				}
+				var query = firestore.collection(STAFFS_COLLECTION);
+				query = query.where("hospital", "==", id);
+				const staffs = await query.get();
+				var staffsList = [];
+				const users = await firestore
+				.collection(USER_COLLECTION)
+				.get();
+                var userMap = {};
+				for(const user of users.docs){
+                   userMap[user.id] = user.data()
+				}
+				for (const staff of staffs.docs) {
+					staffsList.push(userMap[staff.id]);
+				}
+			res(resolve(staffsList));
 			} catch (error) {
 				reject(error);
 			}
@@ -90,6 +106,20 @@ class User {
 				const updatedRecord = await userRef.set(document, {
 					merge: true,
 				});
+				resolve();
+			} catch (error) {
+				reject(error);
+			}
+		});
+	}
+
+	static transferPatient(patientId, hospitalId) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				await firestore
+					.collection(PATIENT_COLLECTION)
+					.doc(patientId)
+					.update({ hospital: hospitalId });
 				resolve();
 			} catch (error) {
 				reject(error);

@@ -52,6 +52,7 @@ class Patient {
 	static #getUserFromId(uid) {
 		return new Promise(async (resolve, reject) => {
 			try {
+				console.log("uid: ", uid);
 				const snapshot = await firestore
 					.collection("users")
 					.where("uid", "==", uid)
@@ -69,7 +70,7 @@ class Patient {
 		});
 	}
 
-	static findById(patientId) {
+	static findById(patientId, poppulate = false) {
 		return new Promise(async (resolve, reject) => {
 			try {
 				console.log(patientId);
@@ -82,6 +83,7 @@ class Patient {
 				}
 				const patient = { id: snapshot.id, ...snapshot.data() };
 				console.log(patient);
+				if (poppulate) {
 				patient.doctor = await this.#getUserFromId(patient.doctor);
 				patient.nurse = await this.#getUserFromId(patient.nurse);
 				for (const key in patient["measurements"]) {
@@ -110,6 +112,7 @@ class Patient {
 							}
 						)
 					);
+				}
 				}
 				resolve(patient);
 			} catch (error) {
@@ -281,6 +284,16 @@ class Patient {
 			}
 		});
 	}
+	static transferPatient(patientId, hospitalId) {
+        return new Promise(async (resolve, reject) => {
+			try {
+                await firestore.collection(PATIENT_MODEL).doc(patientId).update({hospital: hospitalId})
+                resolve();
+			} catch (error) {
+				reject(error);
+			}
+		});
+    }
 }
 
 module.exports = Patient;

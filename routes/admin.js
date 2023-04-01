@@ -145,17 +145,6 @@ router.get("/patients", async (req, res) => {
 	}
 });
 
-router.get("/transferpatient", async (req, res) => {
-	const { patient, toHospital } = req.body;
-	try {
-		const body = await Hospital.transferPatient(patient, toHospital);
-		res.status(200).send({ message: "Success", response: body });
-	} catch (err) {
-		console.log(err);
-		res.status(400).send({ message: "Error changing patients" });
-	}
-});
-
 router.get("/liststaffs", async (req, res) => {
 	const admin = req.token;
 	try {
