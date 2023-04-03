@@ -115,6 +115,7 @@ router.post("/addmeasurement", async (req, res) => {
 		"urine",
 		"drugs",
 		"temperature",
+		"oxytocin",
 	];
 
 	for (let i = 0; i < keys.length; i++) {
