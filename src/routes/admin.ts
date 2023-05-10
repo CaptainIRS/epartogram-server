@@ -100,7 +100,7 @@ router.put(
     res
   ) => {
     const { staffId, onDuty } = req.body;
-    if (!staffId || onDuty == undefined) {
+    if (typeof staffId === "undefined" || typeof onDuty === "undefined") {
       res.status(400).json({ message: "Please enter all fields" });
       return;
     }

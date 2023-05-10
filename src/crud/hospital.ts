@@ -78,8 +78,8 @@ const updateStaff = async (
       throw new Error("Hospital does not exist");
     }
 
-    const staffSnapshot = await db.staffs.where("uid", "==", staffId).get();
-    if (staffSnapshot.docs.length < 1) {
+    const staffSnapshot = await db.staffs.doc(staffId).get();
+    if (!staffSnapshot.exists) {
       throw new Error("Staff not found");
     }
     await db.staffs.doc(staffId).update({

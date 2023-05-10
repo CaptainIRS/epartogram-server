@@ -50,8 +50,12 @@ app.use(async (req, res, next) => {
       const user = await getUserByEmail(authUser.email);
       req.user = user;
 
-      const hospitalId = await getStaffHospitalId(uid);
-      req.hospitalId = hospitalId;
+      if (user.role === "Doctor" || user.role === "Nurse") {
+        const hospitalId = await getStaffHospitalId(uid);
+        req.hospitalId = hospitalId;
+      } else if (user.role === "Admin") {
+        req.hospitalId = uid;
+      }
     } catch (error) {
       return res.status(400).json(error);
     }
