@@ -9,7 +9,7 @@ router.post(
   "/register",
   async (
     req: Request<
-      {},
+      object,
       { error?: string; message?: string },
       { email: string; password: string; role: Role; name: string }
     >,
@@ -22,7 +22,7 @@ router.post(
     try {
       await appCheck.verifyToken(appCheckToken);
     } catch (error) {
-      return res.status(400).json(error);
+      return res.status(400).json({ error: "Invalid App Check token" });
     }
     const { email, password, role, name } = req.body;
     if (
@@ -36,12 +36,12 @@ router.post(
     if (role !== "Admin" && role !== "Doctor" && role !== "Nurse") {
       return res.status(400).json({ error: "Invalid role" });
     }
-    createUser(email, password, role, name);
+    await createUser(email, password, role, name);
     return res.status(201).json({ message: "User created" });
   }
 );
 
-router.get("/roles", function (req, res, next) {
+router.get("/roles", function (req, res) {
   res.json(["Admin", "Nurse", "Doctor"]);
 });
 
@@ -49,7 +49,7 @@ router.post(
   "/fcm-token",
   async (
     req: Request<
-      {},
+      object,
       { error?: string; message?: string },
       { fcmToken: string }
     >,

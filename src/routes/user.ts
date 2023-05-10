@@ -5,7 +5,7 @@ import getTabs from "../utils/getTabs";
 const router = express.Router();
 
 // Useless route, just to test if auth is working
-router.get("/", async (req, res) => {
+router.get("/", (req, res) => {
   if (req.user) {
     const role = req.user.role;
     req.user.tabs = getTabs(role);
@@ -19,7 +19,10 @@ router.get("/", async (req, res) => {
 
 router.get(
   "/onduty",
-  async (req: Request<{}, { message: string; response?: User[] }, {}>, res) => {
+  async (
+    req: Request<object, { message: string; response?: User[] }, object>,
+    res
+  ) => {
     try {
       const body = await getOnDuty(req.hospitalId);
       res.status(200).send({ message: "Success", response: body });

@@ -20,9 +20,9 @@ router.get(
   "/nearbyhospitals",
   async (
     req: Request<
-      {},
+      object,
       { message: string; response?: { id: string; data: Hospital }[] },
-      {}
+      object
     >,
     res
   ) => {
@@ -40,7 +40,7 @@ router.get(
   "/transferpatient",
   async (
     req: Request<
-      {},
+      object,
       { message: string },
       { patientId: string; hospitalId: string }
     >,

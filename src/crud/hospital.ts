@@ -1,5 +1,5 @@
 import { db } from "../utils/firebase";
-import { User, Hospital } from "../types/types";
+import { Hospital } from "../types/types";
 import { PriorityQueue } from "../utils/priorityQueue";
 import { distance } from "../utils/haversine";
 

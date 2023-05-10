@@ -16,10 +16,10 @@ class PriorityQueue<E> {
   }
 
   enqueue(element: E, priority: number) {
-    var qElement = new QElement(element, priority);
-    var contain = false;
+    const qElement = new QElement(element, priority);
+    let contain = false;
 
-    for (var i = 0; i < this.items.length; i++) {
+    for (let i = 0; i < this.items.length; i++) {
       if (this.items[i].priority > qElement.priority) {
         this.items.splice(i, 0, qElement);
         contain = true;
@@ -52,8 +52,8 @@ class PriorityQueue<E> {
   }
 
   listQueue() {
-    var list = [];
-    for (var i = 0; i < this.items.length; i++)
+    const list = [];
+    for (let i = 0; i < this.items.length; i++)
       list.push(this.items[i].element);
     return list;
   }

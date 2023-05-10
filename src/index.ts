@@ -2,10 +2,14 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-var cors = require("cors");
-require("dotenv").config();
+import cors from "cors";
 
-const debug = require("debug")("epartogram:server");
+import dotenv from "dotenv";
+dotenv.config();
+
+import debugTools from "debug";
+const debug = debugTools("epargogram:server");
+
 import http from "http";
 import { grpcServer, serverCredentials } from "./rpcs/rpc";
 import { auth } from "./utils/firebase";
@@ -70,7 +74,7 @@ const server = http.createServer(app);
 grpcServer.bindAsync(
   `127.0.0.1:${process.env.GRPC_PORT}`,
   serverCredentials,
-  (error, port) => {
+  () => {
     console.log(`grpc Server running at port ${process.env.GRPC_PORT}`);
     grpcServer.start();
   }
@@ -82,6 +86,6 @@ server.listen(port, () => {
 
 server.on("listening", () => {
   const addr = server.address();
-  const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  const bind = typeof addr === "string" ? `pipe ${addr}` : `port ${addr.port}`;
   debug("Listening on " + bind);
 });

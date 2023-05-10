@@ -30,7 +30,7 @@ router.post(
   "/add",
   async (
     req: Request<
-      {},
+      object,
       { message: string },
       {
         name: string;
@@ -117,7 +117,10 @@ router.post(
 
 router.get(
   "/list",
-  async (req: Request<{}, Patient[] | { message: string }, {}>, res) => {
+  async (
+    req: Request<object, Patient[] | { message: string }, object>,
+    res
+  ) => {
     try {
       const patients = await getAllPatients();
       res.json(patients);
@@ -132,7 +135,7 @@ router.post(
   "/addmeasurement",
   async (
     req: Request<
-      {},
+      object,
       { message: string },
       {
         patientId: string;
@@ -230,7 +233,7 @@ router.post(
             patientId,
             patient.measurements
           );
-          const { risks } = await validatePatient(newPatient);
+          const { risks } = validatePatient(newPatient);
           const criticality = risks.length;
           await updatePatientCriticality(patientId, criticality);
         }
@@ -268,7 +271,7 @@ router.post(
 router.get("/:id", async (req, res) => {
   try {
     const patient = await getPatientById(req.params.id);
-    const { risks, suggestions } = await validatePatient(patient);
+    const { risks, suggestions } = validatePatient(patient);
     return res.json({ risks, suggestions, patient });
   } catch (err) {
     console.log("patient.js", err);

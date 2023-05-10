@@ -1,8 +1,8 @@
-import { Measurement, Patient } from "../types/types";
+import { Patient } from "../types/types";
 
 const validateNewPatient = (patient: Patient) => {
   const errors = [];
-  let {
+  const {
     age,
     parity,
     alive,
@@ -45,9 +45,9 @@ const validateNewPatient = (patient: Patient) => {
   return errors;
 };
 
-const validatePatient = async (patient: Patient) => {
-  let risks: string[] = [];
-  let suggestions: string[] = [];
+const validatePatient = (patient: Patient) => {
+  const risks: string[] = [];
+  const suggestions: string[] = [];
   try {
     const measurements = patient.measurements;
     if (
@@ -108,11 +108,11 @@ const validatePatient = async (patient: Patient) => {
     }
 
     if (measurements.cervix && measurements.cervix.length > 1) {
-      let recent = measurements.cervix.slice(-1)[0];
-      let prev = measurements.cervix.slice(-2)[0];
-      let recentDilation = parseInt(recent.value, 10);
-      let prevDilation = parseInt(prev.value, 10);
-      let rate =
+      const recent = measurements.cervix.slice(-1)[0];
+      const prev = measurements.cervix.slice(-2)[0];
+      const recentDilation = parseInt(recent.value, 10);
+      const prevDilation = parseInt(prev.value, 10);
+      const rate =
         (recentDilation - prevDilation) /
         ((recent.recordedAt - prev.recordedAt) / 3600000);
       console.log("Rate", rate);

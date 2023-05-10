@@ -1,4 +1,4 @@
-import { auth, firestore, fcm, db } from "./firebase";
+import { auth, fcm, db } from "./firebase";
 
 const sendNotificationToUser = async (email: string, message: string) => {
   const user = await auth.getUserByEmail(email);

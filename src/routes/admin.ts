@@ -1,5 +1,5 @@
 import express, { Request } from "express";
-import { Hospital, Patient, Staff, User } from "../types/types";
+import { Hospital, Patient, User } from "../types/types";
 import {
   addHospital,
   addStaff,
@@ -27,7 +27,7 @@ router.use((req, res, next) => {
 
 router.post(
   "/hospital",
-  async (req: Request<{}, { message: string }, Hospital>, res) => {
+  async (req: Request<object, { message: string }, Hospital>, res) => {
     const id = req.user.uid;
     const { name, tier, latitude, longitude, capacity } = req.body;
     if (
@@ -37,8 +37,7 @@ router.post(
       typeof longitude === "undefined" ||
       typeof capacity === "undefined"
     ) {
-      res.status(400).json({ message: "Please enter all fields" });
-      return;
+      return res.status(400).json({ message: "Please enter all fields" });
     }
     try {
       await addHospital(id, {
@@ -50,10 +49,10 @@ router.post(
         doctors: [],
         nurses: [],
       });
-      res.status(200).send({ message: "Success" });
+      return res.status(200).send({ message: "Success" });
     } catch (err) {
       console.log(err);
-      res.status(500).send({ message: "Error creating hospital" });
+      return res.status(500).send({ message: "Error creating hospital" });
     }
   }
 );
@@ -62,7 +61,7 @@ router.post(
   "/staff",
   async (
     req: Request<
-      {},
+      object,
       { message: string },
       {
         staffId: string;
@@ -71,7 +70,7 @@ router.post(
     >,
     res
   ) => {
-    let { staffId, onDuty } = req.body;
+    const { staffId, onDuty } = req.body;
     if (typeof staffId === "undefined" || typeof onDuty === "undefined") {
       res.status(400).json({ message: "Please enter all fields" });
       return;
@@ -91,7 +90,7 @@ router.put(
   "/staff",
   async (
     req: Request<
-      {},
+      object,
       { message: string },
       {
         staffId: string;
@@ -120,7 +119,7 @@ router.put(
   "/capacity",
   async (
     req: Request<
-      {},
+      object,
       { message: string },
       {
         capacity: number;
@@ -150,7 +149,10 @@ router.put(
 
 router.get(
   "/onduty",
-  async (req: Request<{}, { message: string; response?: User[] }, {}>, res) => {
+  async (
+    req: Request<object, { message: string; response?: User[] }, object>,
+    res
+  ) => {
     try {
       const admin = req.user.uid;
       const body = await getOnDuty(admin);
@@ -166,7 +168,7 @@ router.post(
   "/onduty",
   async (
     req: Request<
-      {},
+      object,
       { message: string },
       {
         staffId: string;
@@ -196,9 +198,9 @@ router.get(
   "/nearbyhospitals",
   async (
     req: Request<
-      {},
+      object,
       { message: string; response?: { id: string; data: Hospital }[] },
-      {}
+      object
     >,
     res
   ) => {
@@ -217,9 +219,9 @@ router.get(
   "/patients",
   async (
     req: Request<
-      {},
+      object,
       { message: string; response?: { id: string; data: Patient }[] },
-      {}
+      object
     >,
     res
   ) => {
@@ -238,9 +240,9 @@ router.get(
   "/liststaffs",
   async (
     req: Request<
-      {},
+      object,
       { message: string; response?: { nurses: User[]; doctors: User[] } },
-      {}
+      object
     >,
     res
   ) => {

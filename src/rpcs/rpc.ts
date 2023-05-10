@@ -18,7 +18,7 @@ async function check(
   callback: sendUnaryData<CheckResponse>
 ) {
   const pendingMeasurements = await getPendingMeasurements();
-  for (let pendingMeasurement of pendingMeasurements) {
+  for (const pendingMeasurement of pendingMeasurements) {
     await sendNotificationToUserByUID(
       pendingMeasurement.nurse,
       `Need to measure ${pendingMeasurement.patientName}'s ${pendingMeasurement.measurementName}`
