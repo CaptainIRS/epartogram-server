@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package rpcs;
-
-message Empty {}
-
-service MonitorService {
-  rpc Check(Empty) returns (Empty) {}
-}

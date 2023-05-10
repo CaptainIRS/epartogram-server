@@ -74,3 +74,5 @@ typings/
 
 serviceAccountKey.json
 sample.txt
+
+dist/
