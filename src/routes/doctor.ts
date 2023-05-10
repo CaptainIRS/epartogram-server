@@ -28,10 +28,10 @@ router.get(
   ) => {
     try {
       const body = await getNearbyHospitals(req.hospitalId);
-      res.status(200).send({ message: "Success", response: body });
-    } catch (err) {
-      console.log(err);
-      res.status(400).send({ message: "Error fetching hospitals" });
+      return res.status(200).send({ message: "Success", response: body });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).send({ message: "Error fetching hospitals" });
     }
   }
 );
@@ -49,10 +49,10 @@ router.get(
     const { patientId, hospitalId } = req.body;
     try {
       await transferPatient(patientId, hospitalId);
-      res.status(200).send({ message: "Success" });
-    } catch (err) {
-      console.log(err);
-      res.status(400).send({ message: "Error changing patients" });
+      return res.status(200).send({ message: "Success" });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).send({ message: "Error changing patients" });
     }
   }
 );

@@ -17,12 +17,12 @@ router.post(
   ) => {
     const appCheckToken = req.header("X-Firebase-AppCheck");
     if (!appCheckToken) {
-      return res.status(400).json({ error: "Missing App Check token" });
+      return res.status(400).json({ error: "Missing app check token" });
     }
     try {
       await appCheck.verifyToken(appCheckToken);
     } catch (error) {
-      return res.status(400).json({ error: "Invalid App Check token" });
+      return res.status(400).json({ error: "Invalid app check token" });
     }
     const { email, password, role, name } = req.body;
     if (
@@ -42,7 +42,7 @@ router.post(
 );
 
 router.get("/roles", function (req, res) {
-  res.json(["Admin", "Nurse", "Doctor"]);
+  return res.json(["Admin", "Nurse", "Doctor"]);
 });
 
 router.post(
@@ -69,7 +69,7 @@ router.post(
       return res.status(200).json({ message: "Token updated" });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ message: "Error when updating FCM Token" });
+      return res.status(500).json({ message: "Error when updating FCM token" });
     }
   }
 );

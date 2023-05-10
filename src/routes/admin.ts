@@ -16,11 +16,11 @@ const router = express.Router();
 router.use((req, res, next) => {
   if (!req.user) {
     return res.status(401).json({
-      message: "Unauthorized Accessing Admin Routes",
+      message: "Unauthorized accessing admin routes",
     });
   }
   if (req.user.role !== "Admin") {
-    return res.status(401).json({ message: "unauthorized" });
+    return res.status(401).json({ message: "Unauthorized" });
   }
   next();
 });
@@ -50,8 +50,8 @@ router.post(
         nurses: [],
       });
       return res.status(200).send({ message: "Success" });
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
       return res.status(500).send({ message: "Error creating hospital" });
     }
   }
@@ -72,16 +72,15 @@ router.post(
   ) => {
     const { staffId, onDuty } = req.body;
     if (typeof staffId === "undefined" || typeof onDuty === "undefined") {
-      res.status(400).json({ message: "Please enter all fields" });
-      return;
+      return res.status(400).json({ message: "Please enter all fields" });
     }
     try {
       const admin = req.user.uid;
       await addStaff(admin, staffId, onDuty);
-      res.status(200).send({ message: "Success" });
-    } catch (err) {
-      console.log(err);
-      res.status(500).send({ message: "Error creating staff" });
+      return res.status(200).send({ message: "Success" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({ message: "Error creating staff" });
     }
   }
 );
@@ -107,10 +106,10 @@ router.put(
     try {
       const admin = req.user.uid;
       await updateStaff(admin, staffId, onDuty);
-      res.status(200).send({ message: "Success" });
-    } catch (err) {
-      console.log(err);
-      res.status(500).send({ message: "Error updating staff" });
+      return res.status(200).send({ message: "Success" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({ message: "Error updating staff" });
     }
   }
 );
@@ -129,20 +128,18 @@ router.put(
   ) => {
     const { capacity } = req.body;
     if (!capacity) {
-      res.status(400).json({ message: "Please enter all fields" });
-      return;
+      return res.status(400).json({ message: "Please enter all fields" });
     } else if (isNaN(capacity)) {
-      res.status(400).json({ message: "Invalid capacity Input" });
-      return;
+      return res.status(400).json({ message: "Invalid capacity input" });
     }
 
     try {
       const admin = req.user.uid;
       await updateCapacity(admin, capacity);
-      res.status(200).send({ message: "Success" });
-    } catch (err) {
-      console.log(err);
-      res.status(500).send({ message: "Error occurred" });
+      return res.status(200).send({ message: "Success" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({ message: "Error occurred" });
     }
   }
 );
@@ -156,10 +153,10 @@ router.get(
     try {
       const admin = req.user.uid;
       const body = await getOnDuty(admin);
-      res.status(200).send({ message: "Success", response: body });
-    } catch (err) {
-      console.log(err);
-      res.status(500).send({ message: "Error fetching staffs" });
+      return res.status(200).send({ message: "Success", response: body });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({ message: "Error fetching staffs" });
     }
   }
 );
@@ -184,10 +181,10 @@ router.post(
         return;
       }
       await setOnDuty(admin, staffId);
-      res.status(200).send({ message: "Success" });
-    } catch (err) {
-      console.log(err);
-      res.status(500).send({
+      return res.status(200).send({ message: "Success" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({
         message: "Error occurred while setting staff on duty",
       });
     }
@@ -207,10 +204,10 @@ router.get(
     try {
       const admin = req.user.uid;
       const body = await getNearbyHospitals(admin);
-      res.status(200).send({ message: "Success", response: body });
-    } catch (err) {
-      console.log(err);
-      res.status(400).send({ message: "Error fetching hospitals" });
+      return res.status(200).send({ message: "Success", response: body });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).send({ message: "Error fetching hospitals" });
     }
   }
 );
@@ -228,10 +225,10 @@ router.get(
     try {
       const admin = req.user.uid;
       const body = await getPatients(admin);
-      res.status(200).send({ message: "Success", response: body });
-    } catch (err) {
-      console.log(err);
-      res.status(400).send({ message: "Error fetching patients" });
+      return res.status(200).send({ message: "Success", response: body });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).send({ message: "Error fetching patients" });
     }
   }
 );
@@ -249,10 +246,10 @@ router.get(
     const admin = req.user.uid;
     try {
       const body = await getUnassignedStaffs(admin);
-      res.status(200).send({ message: "Success", response: body });
-    } catch (err) {
-      console.log(err);
-      res.status(400).send({ message: "Error getting staffs" });
+      return res.status(200).send({ message: "Success", response: body });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).send({ message: "Error getting staffs" });
     }
   }
 );

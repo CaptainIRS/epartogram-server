@@ -80,8 +80,7 @@ router.post(
       typeof doctor === "undefined" ||
       typeof hospital === "undefined"
     ) {
-      res.status(400).json({ message: "Please enter all fields" });
-      return;
+      return res.status(400).json({ message: "Please enter all fields" });
     }
 
     try {
@@ -103,13 +102,12 @@ router.post(
       };
       const errors = validateNewPatient(newPatient);
       if (errors.length > 0) {
-        res.status(400).json({ message: errors.join(", ") });
-        return;
+        return res.status(400).json({ message: errors.join(", ") });
       }
       await savePatient(newPatient);
       return res.status(201).json({ message: "Patient created" });
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
       return res.status(500).send({ message: "Error creating patient" });
     }
   }
@@ -123,10 +121,10 @@ router.get(
   ) => {
     try {
       const patients = await getAllPatients();
-      res.json(patients);
-    } catch (err) {
-      console.log(err);
-      res.status(500).json({ message: "Error getting patients" });
+      return res.json(patients);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Error getting patients" });
     }
   }
 );
@@ -177,8 +175,7 @@ router.post(
       }
       if (!allowedMeasurements.includes(measurementName)) {
         console.log("Invalid measurement name: ", measurementName);
-        res.status(400).json({ message: "Invalid measurement name" });
-        return;
+        return res.status(400).json({ message: "Invalid measurement name" });
       }
       try {
         const patient = await getPatientById(patientId);
@@ -237,14 +234,13 @@ router.post(
           const criticality = risks.length;
           await updatePatientCriticality(patientId, criticality);
         }
-      } catch (err) {
-        console.log(err);
-        res.status(500).send({ message: "Error adding measurement" });
-        return;
+      } catch (error) {
+        console.log(error);
+        return res.status(500).send({ message: "Error adding measurement" });
       }
     }
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Measurement added",
     });
   }
@@ -261,8 +257,8 @@ router.post(
     try {
       await dischargePatient(id, comments);
       return res.status(200).json({ message: "Patient discharged" });
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
       return res.status(500).send({ message: "Error discharging patient" });
     }
   }
@@ -273,8 +269,8 @@ router.get("/:id", async (req, res) => {
     const patient = await getPatientById(req.params.id);
     const { risks, suggestions } = validatePatient(patient);
     return res.json({ risks, suggestions, patient });
-  } catch (err) {
-    console.log("patient.js", err);
+  } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Error getting patient" });
   }
 });

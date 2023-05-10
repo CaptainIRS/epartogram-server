@@ -4,14 +4,13 @@ import { User } from "../types/types";
 import getTabs from "../utils/getTabs";
 const router = express.Router();
 
-// Useless route, just to test if auth is working
 router.get("/", (req, res) => {
   if (req.user) {
     const role = req.user.role;
     req.user.tabs = getTabs(role);
-    res.status(200).json(req.user);
+    return res.status(200).json(req.user);
   } else {
-    res.status(401).json({
+    return res.status(401).json({
       error: "Unauthorized",
     });
   }
@@ -25,10 +24,10 @@ router.get(
   ) => {
     try {
       const body = await getOnDuty(req.hospitalId);
-      res.status(200).send({ message: "Success", response: body });
-    } catch (err) {
-      console.log(err);
-      res.status(400).send({ message: "Error getting staffs" });
+      return res.status(200).send({ message: "Success", response: body });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).send({ message: "Error getting staffs" });
     }
   }
 );

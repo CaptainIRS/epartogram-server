@@ -157,8 +157,8 @@ const validatePatient = (patient: Patient) => {
       }
     }
     return { risks, suggestions, patient: measurements };
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    console.log(error);
     return { risks, suggestions, patient: null };
   }
 };
