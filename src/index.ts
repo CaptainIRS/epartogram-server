@@ -57,6 +57,7 @@ app.use(async (req, res, next) => {
         req.hospitalId = uid;
       }
     } catch (error) {
+      console.log(error);
       return res.status(400).json(error);
     }
   }

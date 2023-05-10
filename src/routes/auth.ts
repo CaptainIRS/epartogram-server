@@ -22,6 +22,7 @@ router.post(
     try {
       await appCheck.verifyToken(appCheckToken);
     } catch (error) {
+      console.log(error);
       return res.status(400).json({ error: "Invalid app check token" });
     }
     const { email, password, role, name } = req.body;

@@ -4,23 +4,19 @@ import { PriorityQueue } from "../utils/priorityQueue";
 import { distance } from "../utils/haversine";
 
 const addHospital = async (hospitalId: string, hospital: Hospital) => {
-  try {
-    const hospitalSnapshot = await db.hospitals.doc(hospitalId).get();
-    if (hospitalSnapshot.exists) {
-      throw new Error("Hospital already exists");
-    }
-    await db.hospitals.doc(hospitalId).set({
-      name: hospital.name,
-      tier: hospital.tier,
-      capacity: hospital.capacity,
-      latitude: hospital.latitude,
-      longitude: hospital.longitude,
-      nurses: [],
-      doctors: [],
-    });
-  } catch (error) {
-    console.log(error);
+  const hospitalSnapshot = await db.hospitals.doc(hospitalId).get();
+  if (hospitalSnapshot.exists) {
+    throw new Error("Hospital already exists");
   }
+  await db.hospitals.doc(hospitalId).set({
+    name: hospital.name,
+    tier: hospital.tier,
+    capacity: hospital.capacity,
+    latitude: hospital.latitude,
+    longitude: hospital.longitude,
+    nurses: [],
+    doctors: [],
+  });
 };
 
 const addStaff = async (
@@ -28,43 +24,39 @@ const addStaff = async (
   staffId: string,
   onDuty: boolean
 ) => {
-  try {
-    const hospitalSnapshot = await db.hospitals.doc(hospitalId).get();
-    if (!hospitalSnapshot.exists) {
-      throw new Error("Hospital does not exist");
-    }
-    const hospital = hospitalSnapshot.data();
-
-    const userSnapshot = await db.users.where("uid", "==", staffId).get();
-    if (userSnapshot.docs.length < 1) {
-      throw new Error("User not found");
-    }
-    const user = userSnapshot.docs[0].data();
-
-    switch (user.role) {
-      case "Nurse":
-        await db.hospitals.doc(hospitalId).update({
-          nurses: [...hospital.nurses, user.uid],
-        });
-        break;
-      case "Doctor":
-        await db.hospitals.doc(hospitalId).update({
-          doctors: [...hospital.doctors, user.uid],
-        });
-        break;
-      case "Admin":
-        throw new Error("Admins cannot be added as staff");
-      default:
-        throw new Error("Invalid role");
-    }
-
-    await db.staffs.doc(staffId).set({
-      hospital: hospitalId,
-      onDuty: onDuty,
-    });
-  } catch (error) {
-    console.log(error);
+  const hospitalSnapshot = await db.hospitals.doc(hospitalId).get();
+  if (!hospitalSnapshot.exists) {
+    throw new Error("Hospital does not exist");
   }
+  const hospital = hospitalSnapshot.data();
+
+  const userSnapshot = await db.users.where("uid", "==", staffId).get();
+  if (userSnapshot.docs.length < 1) {
+    throw new Error("User not found");
+  }
+  const user = userSnapshot.docs[0].data();
+
+  switch (user.role) {
+    case "Nurse":
+      await db.hospitals.doc(hospitalId).update({
+        nurses: [...hospital.nurses, user.uid],
+      });
+      break;
+    case "Doctor":
+      await db.hospitals.doc(hospitalId).update({
+        doctors: [...hospital.doctors, user.uid],
+      });
+      break;
+    case "Admin":
+      throw new Error("Admins cannot be added as staff");
+    default:
+      throw new Error("Invalid role");
+  }
+
+  await db.staffs.doc(staffId).set({
+    hospital: hospitalId,
+    onDuty: onDuty,
+  });
 };
 
 const updateStaff = async (
@@ -72,47 +64,35 @@ const updateStaff = async (
   staffId: string,
   onDuty: boolean
 ) => {
-  try {
-    const hospitalSnapshot = await db.hospitals.doc(hospitalId).get();
-    if (!hospitalSnapshot.exists) {
-      throw new Error("Hospital does not exist");
-    }
-
-    const staffSnapshot = await db.staffs.doc(staffId).get();
-    if (!staffSnapshot.exists) {
-      throw new Error("Staff not found");
-    }
-    await db.staffs.doc(staffId).update({
-      hospital: hospitalId,
-      onDuty: onDuty,
-    });
-  } catch (error) {
-    console.log(error);
+  const hospitalSnapshot = await db.hospitals.doc(hospitalId).get();
+  if (!hospitalSnapshot.exists) {
+    throw new Error("Hospital does not exist");
   }
+
+  const staffSnapshot = await db.staffs.doc(staffId).get();
+  if (!staffSnapshot.exists) {
+    throw new Error("Staff not found");
+  }
+  await db.staffs.doc(staffId).update({
+    hospital: hospitalId,
+    onDuty: onDuty,
+  });
 };
 
 const getStaffHospitalId = async (userId: string) => {
-  try {
-    const staffSnapshot = await db.staffs.doc(userId).get();
-    if (!staffSnapshot.exists) {
-      throw new Error("No Staff Found");
-    }
-    return staffSnapshot.data().hospital;
-  } catch (error) {
-    console.log(error);
+  const staffSnapshot = await db.staffs.doc(userId).get();
+  if (!staffSnapshot.exists) {
+    throw new Error("No Staff Found");
   }
+  return staffSnapshot.data().hospital;
 };
 
 const updateCapacity = async (hospitalId: string, capacity: number) => {
-  try {
-    const hospitalSnapshot = await db.hospitals.doc(hospitalId).get();
-    if (!hospitalSnapshot.exists) {
-      throw new Error("Hospital does not exist");
-    }
-    await db.hospitals.doc(hospitalId).update({ capacity: capacity });
-  } catch (error) {
-    console.log(error);
+  const hospitalSnapshot = await db.hospitals.doc(hospitalId).get();
+  if (!hospitalSnapshot.exists) {
+    throw new Error("Hospital does not exist");
   }
+  await db.hospitals.doc(hospitalId).update({ capacity: capacity });
 };
 
 const getOnDuty = async (hospitalId: string) => {
@@ -132,30 +112,26 @@ const getOnDuty = async (hospitalId: string) => {
 };
 
 const setOnDuty = async (hospitalId: string, staffId: string) => {
-  try {
-    const hospitalSnapshot = await db.hospitals.doc(hospitalId).get();
-    if (!hospitalSnapshot.exists) {
-      throw new Error("Hospital does not exist");
-    }
-    const staffSnapshot = await db.staffs
-      .where("hospital", "==", hospitalId)
-      .where("staff", "==", staffId)
-      .get();
-    if (staffSnapshot.empty) {
-      throw new Error("Staff does not exist");
-    }
-    const allActiveStaffsSnapshot = await db.staffs
-      .where("hospital", "==", hospitalId)
-      .where("status", "==", true)
-      .get();
-    for (const staff of allActiveStaffsSnapshot.docs) {
-      await db.staffs.doc(staff.id).update({ onDuty: false });
-    }
-    const staff = staffSnapshot.docs[0];
-    await db.staffs.doc(staff.id).update({ onDuty: true });
-  } catch (error) {
-    console.log(error);
+  const hospitalSnapshot = await db.hospitals.doc(hospitalId).get();
+  if (!hospitalSnapshot.exists) {
+    throw new Error("Hospital does not exist");
   }
+  const staffSnapshot = await db.staffs
+    .where("hospital", "==", hospitalId)
+    .where("staff", "==", staffId)
+    .get();
+  if (staffSnapshot.empty) {
+    throw new Error("Staff does not exist");
+  }
+  const allActiveStaffsSnapshot = await db.staffs
+    .where("hospital", "==", hospitalId)
+    .where("status", "==", true)
+    .get();
+  for (const staff of allActiveStaffsSnapshot.docs) {
+    await db.staffs.doc(staff.id).update({ onDuty: false });
+  }
+  const staff = staffSnapshot.docs[0];
+  await db.staffs.doc(staff.id).update({ onDuty: true });
 };
 
 const getUnassignedStaffs = async (hospitalId: string) => {
