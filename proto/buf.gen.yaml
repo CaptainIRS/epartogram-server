@@ -1,0 +1,6 @@
+version: v1
+plugins:
+  - name: ts
+    out: ../src/proto
+    opt: generate_dependencies,long_type_string,server_grpc1
+    path: ../node_modules/@protobuf-ts/plugin/bin/protoc-gen-ts

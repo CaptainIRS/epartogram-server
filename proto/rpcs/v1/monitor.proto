@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package rpcs.v1;
+
+message CheckRequest {}
+message CheckResponse {}
+
+service MonitorService {
+  rpc Check(CheckRequest) returns (CheckResponse) {};
+}
