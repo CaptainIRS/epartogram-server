@@ -116,7 +116,7 @@ const validatePatient = async (patient) => {
 				risks.push(
 					"High moulding detected. Refer to higher health facility."
 				);
-				suggestions(
+				suggestions.push(
 					"Refer to higher health facility as very high moulding detected. Possible vaginal obstruction."
 				);
 			}
@@ -139,10 +139,10 @@ const validatePatient = async (patient) => {
 				((recent.timeStamp - prev.timeStamp) / 3600000);
 			console.log("Rate", rate);
 			if (rate < 0.2) {
-				suggestions.push("Call doctor immediately");
+				suggestions.push("Contact specialist immediately because of slow progress");
 				risks.push("Very low rate of cervical dilation");
 			} else if (rate < 1) {
-				suggestions.push("Monitor patient closely");
+				suggestions.push("Monitor patient closely because of slow progress");
 				risks.push("Low rate of cervical dilation");
 			}
 		}

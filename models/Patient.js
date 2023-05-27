@@ -87,31 +87,34 @@ class Patient {
 				patient.doctor = await this.#getUserFromId(patient.doctor);
 				patient.nurse = await this.#getUserFromId(patient.nurse);
 				for (const key in patient["measurements"]) {
-					// console.log(patient["measurements"][key]);
-					if (patient["measurements"][key].length === 0) {
-						continue;
-					}
+					if(key !== "risks" && key !== "suggestions"){
+						console.log(key);
+						// console.log(patient["measurements"][key]);
+						if (patient["measurements"][key].length === 0) {
+							continue;
+						}
 
-					const firstTimeStamp =
-						patient["measurements"][key][0]["timeStamp"];
-					patient["measurements"][key] = await Promise.all(
-						patient["measurements"][key].map(
-							async (measurement) => {
-								// console.log(measurement);
-								return {
-									...measurement,
-									timeStamp:
-										(measurement.timeStamp -
-											firstTimeStamp) /
-											(1000 * 60 * 60) +
-										8,
-									recordedBy: await this.#getUserFromId(
-										measurement.recordedBy
-									),
-								};
-							}
-						)
-					);
+						const firstTimeStamp =
+							patient["measurements"][key][0]["timeStamp"];
+						patient["measurements"][key] = await Promise.all(
+							patient["measurements"][key].map(
+								async (measurement) => {
+									// console.log(measurement);
+									return {
+										...measurement,
+										timeStamp:
+											Math.round((measurement.timeStamp -
+												firstTimeStamp) /
+												(1000 * 60 * 60)) +
+											8,
+										recordedBy: await this.#getUserFromId(
+											measurement.recordedBy
+										),
+									};
+								}
+							)
+						);
+					}
 				}
 				}
 				resolve(patient);

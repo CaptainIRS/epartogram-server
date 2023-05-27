@@ -7,6 +7,7 @@ module.exports = (role) => {
       "patient-history",
       "discharge-patient",
       "near-by-hospital",
+      "Risks & Suggestions"
     ];
   } else if (role === "Nurse") {
     return [
@@ -14,9 +15,9 @@ module.exports = (role) => {
       "add-patient",
       "add-measurement",
       "patient-history",
+      "Risks & Suggestions"
     ];
   } else if (role === "Admin") {
-    // return ["add-staff", "update-details", "Staff On Duty"];
     return ["update-details", "add-staff", "Staff On Duty"];
   }
 };

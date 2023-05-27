@@ -18,7 +18,7 @@ router.use((req, res, next) => {
 
 router.post("/hospital", async (req, res) => {
 	const admin = req.token;
-	const { name, tier, lat, lon, capacity } = req.body;
+	const { name, tier, lat, lon, capacity, specialist, cesarean } = req.body;
 	if (!name || !tier || !lat || !lon || !capacity) {
 		res.status(400).json({ message: "Please enter all fields" });
 		return;
@@ -30,6 +30,8 @@ router.post("/hospital", async (req, res) => {
 			lat,
 			lon,
 			capacity,
+			specialist,
+			cesarean,
 		});
 		await newHospital.addHospital(admin);
 		res.status(200).send({ message: "Success" });

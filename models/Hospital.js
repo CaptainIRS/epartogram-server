@@ -8,12 +8,14 @@ const STAFFS_COLLECTION = "staffs";
 const PATIENT_COLLECTION = "patients";
 
 class Hospital {
-	constructor({ name, tier, capacity, lat, lon }) {
+	constructor({ name, tier, capacity, lat, lon, cesarean, specialist }) {
 		this.name = name;
 		this.tier = tier;
 		this.capacity = capacity;
 		this.lat = lat;
 		this.lon = lon;
+		this.cesarean = cesarean;
+		this.specialist = specialist;
 	}
 
 	addHospital(id) {
@@ -33,6 +35,8 @@ class Hospital {
 					lon: this.lon,
 					nurses: [],
 					doctors: [],
+					cesarean: this.cesarean,
+					specialist: this.specialist,
 				});
 				resolve();
 			} catch (error) {

@@ -46,7 +46,7 @@ router.post("/add", async (req, res) => {
 		typeof doctor === "undefined" ||
 		typeof hospital === "undefined"
 	) {
-		res.status(400).json({ message: "Please enter all fields" });
+		res.status(400).json({ message: "Please enter all required fields" });
 		return;
 	}
 
@@ -67,7 +67,7 @@ router.post("/add", async (req, res) => {
 			nnd,
 			riskFactors,
 			contractionStartTime,
-			membraneRuptureTime,
+			membraneRuptureTime: membraneRuptureTime ? membraneRuptureTime : null,
 			height,
 			doctor: doctor || null,
 			nurse: nurse || null,
@@ -172,21 +172,43 @@ router.post("/addmeasurement", async (req, res) => {
 					recordedBy: req.user.id,
 					timeStamp,
 				});
-				const newPatient = await Patient.addMeasurement(
+				await Patient.addMeasurement(
 					patientId,
 					patient
 				);
-				const { risks, suggestions, patientData } =
-					await validatePatient(newPatient);
-				const critical = risks.length;
-				await Patient.updateParameter(patientId, "critical", critical);
 			}
 		} catch (err) {
 			console.log(err);
 			res.status(500).send({ message: "Error adding measurement" });
 			return;
 		}
+		
 	}
+	const patient = await Patient.findById(patientId, false);
+	const { risks, suggestions, patientData } =
+				await validatePatient(patient);
+	const critical = risks.length;
+	if (!patient["measurements"]["risks"]) {
+		patient["measurements"]["risks"] = [];
+	}
+	if (!patient["measurements"]["suggestions"]) {
+		patient["measurements"]["suggestions"] = [];
+	}
+	patient["measurements"]["risks"].push({
+		risks,
+		recordedBy: req.user.id,
+		timeStamp: Date.now(),
+	});
+	patient["measurements"]["suggestions"].push({
+		suggestions,
+		recordedBy: req.user.id,
+		timeStamp: Date.now(),
+	});
+	await Patient.addMeasurement(
+		patientId,
+		patient
+	);
+	await Patient.updateParameter(patientId, "critical", critical);
 
 	res.status(201).json({
 		message: "Measurement added",
@@ -211,7 +233,7 @@ router.get("/:id", async (req, res) => {
 			patient
 		);
 		// res.json(patient);
-		console.log(risks, suggestions);
+		console.log(risks, suggestions, patient.measurements);
 		return res.json({ risks, suggestions, patient });
 	} catch (err) {
 		console.log("patient.js", err);
