@@ -16,6 +16,7 @@ module.exports = (role) => {
       "patient-history",
     ];
   } else if (role === "Admin") {
-    return ["add-staff", "update-details", "Staff On Duty"];
+    // return ["add-staff", "update-details", "Staff On Duty"];
+    return ["update-details", "add-staff", "Staff On Duty"];
   }
 };

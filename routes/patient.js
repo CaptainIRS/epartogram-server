@@ -121,7 +121,7 @@ router.post("/addmeasurement", async (req, res) => {
 	for (let i = 0; i < keys.length; i++) {
 		const measurementName = keys[i];
 		const value = body[measurementName];
-		if (!value) {
+		if (typeof value === "undefined" || value === '') {
 			continue;
 		}
 		if (!allowedMeasurements.includes(measurementName)) {
@@ -131,7 +131,7 @@ router.post("/addmeasurement", async (req, res) => {
 		}
 		try {
 			const patient = await Patient.findById(patientId, false);
-			console.log(patient);
+			// console.log(patient);
 			if (!patient) {
 				return res.status(400).json({ message: "Patient not found" });
 			}
@@ -165,7 +165,7 @@ router.post("/addmeasurement", async (req, res) => {
 
 				await Patient.addMeasurement(patientId, patient);
 			} else {
-				console.log(measurementName, value, req.user.id);
+				// console.log(measurementName, value, req.user.id);
 
 				patient["measurements"][measurementName].push({
 					value,

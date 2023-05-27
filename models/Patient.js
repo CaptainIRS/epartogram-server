@@ -52,7 +52,7 @@ class Patient {
 	static #getUserFromId(uid) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				console.log("uid: ", uid);
+				// console.log("uid: ", uid);
 				const snapshot = await firestore
 					.collection("users")
 					.where("uid", "==", uid)
@@ -73,7 +73,7 @@ class Patient {
 	static findById(patientId, poppulate = false) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				console.log(patientId);
+				// console.log(patientId);
 				const snapshot = await firestore
 					.collection(PATIENT_MODEL)
 					.doc(patientId)
@@ -82,7 +82,7 @@ class Patient {
 					reject("Patient not found");
 				}
 				const patient = { id: snapshot.id, ...snapshot.data() };
-				console.log(patient);
+				// console.log(patient);
 				if (poppulate) {
 				patient.doctor = await this.#getUserFromId(patient.doctor);
 				patient.nurse = await this.#getUserFromId(patient.nurse);
@@ -97,7 +97,7 @@ class Patient {
 					patient["measurements"][key] = await Promise.all(
 						patient["measurements"][key].map(
 							async (measurement) => {
-								console.log(measurement);
+								// console.log(measurement);
 								return {
 									...measurement,
 									timeStamp:
