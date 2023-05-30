@@ -103,9 +103,9 @@ class Patient {
 									return {
 										...measurement,
 										timeStamp:
-											Math.round((measurement.timeStamp -
+											Math.round(2*(measurement.timeStamp -
 												firstTimeStamp) /
-												(1000 * 60 * 60)) +
+												(1000 * 60 * 60))/2 +
 											8,
 										recordedBy: await this.#getUserFromId(
 											measurement.recordedBy
